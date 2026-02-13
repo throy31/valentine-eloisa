@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dear, Will You Be My Valentine? 💜</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Crimson+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #9b7dd4;
+            --secondary: #c9a7eb;
+            --accent: #e8d5ff;
+            --dark: #4a3760;
+            --light: #f5f0ff;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            overflow-x: hidden;
+            background: var(--light);
+        }
+
+        /* Animated Background */
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: linear-gradient(135deg, #e8d5ff 0%, #f5f0ff 50%, #d4c5f9 100%);
+        }
+
+        .floating-hearts {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Music Notes */
+        .music-note {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.2;
+            color: var(--primary);
+            animation: musicFloat 12s infinite;
+        }
+
+        @keyframes musicFloat {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.2;
+            }
+        }
+
+        /* Screen Container */
+        .screen {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            padding: 20px;
+        }
+
+        .screen.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .screen.fade-out {
+            opacity: 0;
+            transform: scale(1.1);
+        }
+
+        /* Welcome Screen */
+        .welcome-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 60px 40px;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(103, 58, 183, 0.3);
+            border: 3px solid rgba(155, 125, 212, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(155, 125, 212, 0.1) 0%, transparent 70%);
+            animation: pulse 4s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--dark);
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .emoticon {
+            font-size: 1.5em;
+            margin: 15px 0;
+        }
+
+        .instruction {
+            font-size: 1.1em;
+            color: var(--dark);
+            margin: 20px 0;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            margin: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 10px 30px rgba(103, 58, 183, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(103, 58, 183, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(201, 167, 235, 0.3);
+            color: var(--dark);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* Envelope Screen */
+        .envelope-container {
+            perspective: 1000px;
+        }
+
+        .envelope {
+            width: 400px;
+            height: 280px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.6s;
+        }
+
+        .envelope:hover {
+            transform: scale(1.05);
+        }
+
+        .envelope-back {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+            border-radius: 10px;
+            box-shadow: 0 15px 50px rgba(103, 58, 183, 0.4);
+            position: relative;
+        }
+
+        .envelope-flap {
+            width: 0;
+            height: 0;
+            border-left: 200px solid transparent;
+            border-right: 200px solid transparent;
+            border-bottom: 140px solid var(--primary);
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: top center;
+            transition: transform 0.8s ease;
+            filter: drop-shadow(0 5px 20px rgba(0, 0, 0, 0.2));
+        }
+
+        .envelope.opening .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .envelope-seal {
+            width: 50px;
+            height: 50px;
+            background: var(--accent);
+            border-radius: 50%;
+            position: absolute;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .envelope-question {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 1.2em;
+            color: var(--dark);
+        }
+
+        /* Message Screen */
+        .message-card {
+            background: white;
+            border-radius: 30px;
+            padding: 50px 40px;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(103, 58, 183, 0.3);
+            border: 3px solid var(--accent);
+            position: relative;
+        }
+
+        .message-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .message-title {
+            font-size: 1.5em;
+            color: var(--primary);
+            font-style: italic;
+            margin-bottom: 10px;
+        }
+
+        .message-content {
+            background: linear-gradient(135deg, rgba(155, 125, 212, 0.05) 0%, rgba(232, 213, 255, 0.1) 100%);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            line-height: 1.8;
+            font-size: 1.15em;
+            color: var(--dark);
+            text-align: center;
+        }
+
+        .message-name {
+            font-size: 1.3em;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        /* Gallery Screen */
+        .gallery-container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .gallery-title {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--dark);
+            margin-bottom: 40px;
+        }
+
+        .photo-grid {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .photo-slot {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--secondary) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            box-shadow: 0 10px 30px rgba(103, 58, 183, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .photo-slot:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        .photo-slot::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .photo-slot:hover::before {
+            transform: translateX(100%);
+        }
+
+        .upload-text {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.3em;
+            color: white;
+            font-family: 'Crimson Text', serif;
+            opacity: 0.8;
+        }
+
+        /* Final Question Screen */
+        .final-card {
+            background: white;
+            border-radius: 40px;
+            padding: 60px 50px;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(103, 58, 183, 0.4);
+            border: 4px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: radial-gradient(circle, rgba(155, 125, 212, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .big-question {
+            font-family: 'Playfair Display', serif;
+            font-size: 3em;
+            color: var(--dark);
+            margin: 30px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hearts-decoration {
+            font-size: 2em;
+            margin: 20px 0;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        /* Success Screen */
+        .success-card {
+            background: white;
+            border-radius: 40px;
+            padding: 80px 50px;
+            max-width: 700px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(103, 58, 183, 0.4);
+            position: relative;
+        }
+
+        .celebration {
+            font-size: 5em;
+            animation: celebrate 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes celebrate {
+            from { transform: scale(1) rotate(-5deg); }
+            to { transform: scale(1.1) rotate(5deg); }
+        }
+
+        .success-message {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--dark);
+            margin: 30px 0;
+            line-height: 1.3;
+        }
+
+        .love-note {
+            font-size: 1.3em;
+            color: var(--primary);
+            font-style: italic;
+            margin: 20px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .envelope { width: 300px; height: 210px; }
+            .envelope-flap {
+                border-left: 150px solid transparent;
+                border-right: 150px solid transparent;
+                border-bottom: 105px solid var(--primary);
+            }
+            .message-card, .final-card, .success-card {
+                padding: 40px 30px;
+            }
+            .big-question { font-size: 2.2em; }
+            .photo-slot {
+                width: 250px;
+                height: 250px;
+                font-size: 3em;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    <div class="floating-hearts" id="floatingHearts"></div>
+
+    <!-- Screen 1: Welcome -->
+    <div class="screen active" id="screen1">
+        <div class="welcome-card">
+            <h1>Happy Valentine's Day!</h1>
+            <p class="subtitle">my dear</p>
+            <div class="emoticon">(ᵔᴥᵔ)</div>
+            <p class="instruction">Click the next button! (づ￣ ³￣)づ♥</p>
+            <button class="btn btn-primary" onclick="goToScreen(2)">Next! →</button>
+        </div>
+    </div>
+
+    <!-- Screen 2: Envelope -->
+    <div class="screen" id="screen2">
+        <div class="envelope-container">
+            <div class="envelope" id="envelope" onclick="openEnvelope()">
+                <div class="envelope-back">
+                    <div class="envelope-flap"></div>
+                    <div class="envelope-seal">💌</div>
+                </div>
+            </div>
+            <p class="envelope-question">Do you want to open it po? ヾ(＾-＾)ノ</p>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="goToScreen(1)">← Back</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 3: First Message -->
+    <div class="screen" id="screen3">
+        <div class="message-card">
+            <div class="message-header">
+                <div class="message-title">Ooo... A message! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧</div>
+            </div>
+            <div class="message-content">
+                <div class="message-name">Hello Dear ♡</div>
+                <p>I would like to share a few thoughts. Ever since we've been together, you have changed me for the better, and I thank you for that.</p>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="goToScreen(4)">Continue ♥</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 4: Second Message -->
+    <div class="screen" id="screen4">
+        <div class="message-card">
+            <div class="message-header">
+                <div class="message-title">There's more... </div>
+            </div>
+            <div class="message-content">
+                <p>You make everything feel easy and light.</p>
+                <p style="margin-top: 15px;">Every day with you is a gift, and I want to make this Valentine's Day special for you.</p>
+            </div>
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="btn btn-primary" onclick="goToScreen(5)">Next ♥</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 5: Photo Gallery -->
+    <div class="screen" id="screen5">
+        <div class="gallery-container">
+            <h2 class="gallery-title">My Dear ♡</h2>
+            <div class="photo-grid">
+                <div class="photo-slot" style="background-image: url('your-photo.jfif'); background-size: cover; background-position: center;">
+                </div>
+            </div>
+                <button class="btn btn-primary" onclick="goToScreen(6)">Continue ♥</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 6: The Big Question -->
+    <div class="screen" id="screen6">
+        <div class="final-card">
+            <div class="hearts-decoration">💜 ✨ 💜</div>
+            <h2 class="big-question">Dear,<br>Will You Please Be My Valentine?</h2>
+            <div class="hearts-decoration">💜 ✨ 💜</div>
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="goToScreen(7)" style="font-size: 1.3em; padding: 20px 50px;">
+                    Yes! 💜
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Screen 7: Success -->
+    <div class="screen" id="screen7">
+        <div class="success-card">
+            <h2 class="success-message">Yeheyyy!!</h2>
+            <p class="love-note">Let's have a date on September 17, 2026. Other details are to be followed pa hahahaja</p>
+            <div class="celebration">💜</div>
+            <p style="font-size: 1.2em; color: var(--dark); margin-top: 30px;">
+                Advance Happy Valentine's Day, dear! ♡
+            </p>
+            <button class="btn btn-primary" onclick="goToScreen(1)" style="margin-top: 30px;">
+                Start Over ↺
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Create floating hearts and music notes
+        function createFloatingElements() {
+            const container = document.getElementById('floatingHearts');
+            const hearts = ['💜', '💕', '💗', '✨', '⭐'];
+            const notes = ['♪', '♫', '♬'];
+            
+            // Create hearts
+            for (let i = 0; i < 15; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 15 + 's';
+                heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+                container.appendChild(heart);
+            }
+            
+            // Create music notes
+            for (let i = 0; i < 8; i++) {
+                const note = document.createElement('div');
+                note.className = 'music-note';
+                note.textContent = notes[Math.floor(Math.random() * notes.length)];
+                note.style.left = Math.random() * 100 + '%';
+                note.style.top = Math.random() * 100 + '%';
+                note.style.animationDelay = Math.random() * 12 + 's';
+                container.appendChild(note);
+            }
+        }
+
+        let currentScreen = 1;
+
+        function goToScreen(screenNumber) {
+            // Fade out current screen
+            const current = document.getElementById('screen' + currentScreen);
+            current.classList.remove('active');
+            current.classList.add('fade-out');
+            
+            setTimeout(() => {
+                current.classList.remove('fade-out');
+                current.classList.add('hidden');
+                
+                // Fade in new screen
+                const next = document.getElementById('screen' + screenNumber);
+                next.classList.remove('hidden');
+                setTimeout(() => {
+                    next.classList.add('active');
+                }, 50);
+                
+                currentScreen = screenNumber;
+            }, 400);
+        }
+
+        function openEnvelope() {
+            const envelope = document.getElementById('envelope');
+            envelope.classList.add('opening');
+            
+            setTimeout(() => {
+                goToScreen(3);
+            }, 1000);
+        }
+
+        function noButton() {
+            alert("Oh no! 😢 Maybe think about it a little more? 💜");
+        }
+
+        // Initialize
+        createFloatingElements();
+        
+        // Add initial hidden class to all screens except first
+        for (let i = 2; i <= 7; i++) {
+            document.getElementById('screen' + i).classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
